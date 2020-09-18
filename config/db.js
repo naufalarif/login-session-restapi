@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const MONGOURI = "<your-base-url>";
+const MONGOURI = "mongodb+srv://admin123:admin123@cluster0.bchjj.mongodb.net/node-auth?retryWrites=true&w=majority";
 
 const InitiateMongoServer = async () => {
 	try {

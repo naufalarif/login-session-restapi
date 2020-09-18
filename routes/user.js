@@ -47,7 +47,7 @@ router.post("/signup",
 			let user = await User.findOne({ email });
 			if (user) {
 				return res.status(400).json({
-					msg: "User Already Exists"
+					errors: "Email already exists"
 				});
 			}
 
@@ -124,7 +124,7 @@ router.post("/login",
 			let user = await User.findOne({ email });
 			if (!user) {
 				return res.status(400).json({
-					message: "User Not Exist"
+					errors: "User not exist"
 				});
 			}
 
@@ -132,7 +132,7 @@ router.post("/login",
 			const isMatch = await bcrypt.compare(password, user.password);
 			if (!isMatch)
 				return res.status(400).json({
-					message: "Incorrect Password!"
+					errors: "Incorrect password!"
 				});
 
 			// set payload
@@ -146,7 +146,7 @@ router.post("/login",
 			jwt.sign(
 				payload,
 				"randomString", // token key
-				{ expiresIn: 6000 },
+				// { expiresIn: 6000 },
 				(err, token) => {
 					if (err) throw err;
 					// give token when success
@@ -181,7 +181,7 @@ router.get("/profile", auth, async (req, res) => {
 		// find user by id
 		const user = await User.findById(req.user.id);
 		// show user profile
-		res.json(user.email);
+		res.json(user);
 	} catch (e) {
 		// error while fetching
 		res.send({ message: "Error in Fetching user "});
@@ -205,8 +205,6 @@ router.patch("/profile/update",
 		// find user by id
 		const user = await User.findById(req.user.id);
 
-		let validated = false;
-
 		// deconstruct
 		const { username, email, password } = req.body;
 
@@ -219,7 +217,9 @@ router.patch("/profile/update",
 			user.email = email;
 		}
 		if (password != null) {
-			user.password = password;
+			// encrypt password
+			const salt = await bcrypt.genSalt(10);
+			user.password = await bcrypt.hash(password, salt);
 		}
 
 		const userUpdated = await user.save();

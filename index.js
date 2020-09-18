@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const user = require("./routes/user");
 const InitiateMongoServer = require('./config/db');
+const cors = require('cors');
 
 // Initiate Mongo Server
 InitiateMongoServer();
@@ -13,6 +14,7 @@ const PORT = process.env.PORT || 4000;
 
 // Middleware
 app.use(bodyParser.json());
+app.use(cors());
 
 app.get("/", (req, res) => {
 	res.json({ message: "Connected to database" });
